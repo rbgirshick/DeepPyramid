@@ -1,4 +1,4 @@
-function pyra = deep_pyramid(im, cnn_model, padx, pady, cache_opts)
+function [pyra, im_pyra] = deep_pyramid(im, cnn_model, padx, pady, cache_opts)
 % pyra = deep_pyramid(im, cnn_model, padx, pady, cache_opts)
 %
 % im: a color image
@@ -45,25 +45,26 @@ num_levels = 7;
 % Scale factor to bring the norm of a 10x10 patch of features
 % somewhat close to what I've used in R-CNN (so I can use a similar 
 % C = 0.001 value in SVMs)
-Z = 50;
+% Z = 50;
+% Z = 1;
 
-pyra = feat_pyramid(im, cnn_model, num_levels);
+[pyra, im_pyra] = feat_pyramid(im, cnn_model, num_levels);
 
 imsize = size(im);
 pyra.imsize = imsize(1:2);
 pyra.num_levels = num_levels;
 
-% add padding
-for i = 1:pyra.num_levels
-  pyra.feat{i} = padarray(pyra.feat{i} * 1/Z, [pady padx 0], 0);
-end
+%% add padding
+%for i = 1:pyra.num_levels
+%  pyra.feat{i} = padarray(pyra.feat{i} * 1/Z, [pady padx 0], 0);
+%end
 pyra.valid_levels = true(pyra.num_levels, 1);
 pyra.padx = padx;
 pyra.pady = pady;
 
 
 % ------------------------------------------------------------------------
-function pyra = feat_pyramid(im, cnn_model, num_levels)
+function [pyra, im_pyra] = feat_pyramid(im, cnn_model, num_levels)
 % ------------------------------------------------------------------------
 % Compute a feature pyramid with caffe
 
@@ -72,9 +73,9 @@ if cnn_model.init_key ~= caffe('get_init_key')
 end
 
 % TODO(rbg) yes, hardcoded numbers of joy
-batch_width = 1723;
-batch_height = 1723;
-sz_w = (batch_width-11)/16+1;
+batch_width = 1713;
+batch_height = 1713;
+sz_w = (batch_width - 1) / 16 + 1;
 sz_h = sz_w;
 
 %th = tic;
@@ -85,16 +86,19 @@ sz_h = sz_w;
 %th = tic;
 feat = caffe('forward', {batch});
 % standard song and dance of swapping width and height between caffe and matlab
-feat_pyra = ...
+feat = ...
     permute(reshape(feat{1}, [sz_w sz_h 256 num_levels]), [2 1 3 4]);
 %fprintf('fwd: %.3fs\n', toc(th));
 
 % crop out feat map levels
-for i = 1:num_levels
-  pyra.feat{i} = feat_pyra(1:level_sizes(i,1), 1:level_sizes(i,2), :, i);
-end
+%for i = 1:num_levels
+%  pyra.feat{i} = feat(1:level_sizes(i,1), 1:level_sizes(i,2), :, i);
+%end
+pyra.feat = feat;
 pyra.scales = scales;
+pyra.level_sizes = level_sizes;
 
+im_pyra = batch;
 
 % ------------------------------------------------------------------------
 function [batch, scales, level_sizes] = ...
@@ -111,13 +115,13 @@ im = bsxfun(@minus, im, cnn_model.mu);
 
 im_sz = size(im);
 if im_sz(1) > im_sz(2)
-  height = batch_height-10;
+  height = batch_height;
   width = NaN;
-  scale = height/im_sz(1);
+  scale = height / im_sz(1);
 else
   height = NaN;
-  width = batch_width-10;
-  scale = width/im_sz(2);
+  width = batch_width;
+  scale = width / im_sz(2);
 end
 im_orig = im;
 
@@ -133,11 +137,8 @@ for i = 0:num_levels-1
   end
   im_sz = size(im);
   im_sz = im_sz(1:2);
-  level_sizes(i+1, :) = ceil(im_sz / 16);
+  level_sizes(i+1, :) = ceil((im_sz - 1) / 16 + 1);
   % Make width the fastest dimension (for caffe)
   im = permute(im, [2 1 3]);
-  % 6 ==> pad by 5 pixels on the top and left to implement "same" 
-  % convolution with the conv1 filters
-  % TODO(rbg) this padding should be done in caffe
-  batch(6:6+im_sz(2)-1, 6:6+im_sz(1)-1, :, i+1) = im;
+  batch(1:im_sz(2), 1:im_sz(1), :, i+1) = im;
 end
