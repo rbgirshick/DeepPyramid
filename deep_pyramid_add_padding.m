@@ -8,6 +8,16 @@ function pyra = deep_pyramid_add_padding(pyra, padx, pady, uniform_output)
 %     false => each pyramid level is stored as a 3D array with the height
 %     and width of that level (same as in the DPM HOG feature pyramid code)
 
+% AUTORIGHTS
+% ---------------------------------------------------------
+% Copyright (c) 2014, Ross Girshick
+%
+% This file is part of the DeepPyramid code and is available
+% under the terms of the Simplified BSD License provided in
+% LICENSE. Please retain this notice and LICENSE if you use
+% this file (or any portion of it) in your project.
+% ---------------------------------------------------------
+
 pyra.padx = padx;
 pyra.pady = pady;
 

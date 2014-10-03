@@ -4,9 +4,18 @@ function im_boxes = pyra_to_im_coords(pyra, boxes)
 % and (x2, y2) is the lower-right corner of the box in pyramid level pyra_level
 % Assumes 1-based indexing.
 
-sbin = 16;
+% AUTORIGHTS
+% ---------------------------------------------------------
+% Copyright (c) 2014, Ross Girshick
+%
+% This file is part of the DeepPyramid code and is available
+% under the terms of the Simplified BSD License provided in
+% LICENSE. Please retain this notice and LICENSE if you use
+% this file (or any portion of it) in your project.
+% ---------------------------------------------------------
+
 % pyramid to im scale factors for each scale
-scales = sbin ./ pyra.scales;
+scales = pyra.stride ./ pyra.scales;
 % pyramid to im scale factors for each pyra level in boxes
 scales = scales(boxes(:, end));
 

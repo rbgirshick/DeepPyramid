@@ -8,6 +8,15 @@ function [pyra, im_pyra] = deep_pyramid(im, cnn_model, cache_opts)
 %   .image_id: file name (without extension) inside cache directory
 %   .debug [optional]: print info about cache hit/miss
 
+% AUTORIGHTS
+% ---------------------------------------------------------
+% Copyright (c) 2014, Ross Girshick
+%
+% This file is part of the DeepPyramid code and is available
+% under the terms of the Simplified BSD License provided in
+% LICENSE. Please retain this notice and LICENSE if you use
+% this file (or any portion of it) in your project.
+% ---------------------------------------------------------
 
 % Load from cache if cache_opts is specified
 if exist('cache_opts', 'var') && ~isempty(cache_opts)
@@ -36,6 +45,7 @@ end
 imsize = size(im);
 pyra.imsize = imsize(1:2);
 pyra.num_levels = cnn_model.pyra.num_levels;
+pyra.stride = cnn_model.pyra.stride;
 
 pyra.valid_levels = true(pyra.num_levels, 1);
 pyra.padx = 0;
