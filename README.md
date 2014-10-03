@@ -32,7 +32,7 @@ This code was used in our [tech report](http://arxiv.org/pdf/1409.5403v2.pdf) ab
 0. **Get DeepPyramid**
   0. `git clone https://github.com/rbgirshick/DeepPyramid.git`
   0. If you haven't installed R-CNN, you'll need to download its [models](http://www.cs.berkeley.edu/~rbg/r-cnn-release1-data.tgz)
-  1. Copy R-CNN's non-finetuned ImageNet network `data/caffe_nets/ilsvrc_2012_train_iter_310k` to `'data/caffe_nets/ilsvrc_2012_train_iter_310k` under the DeepPyramid code (or just create a symlink).
+  1. Copy R-CNN's non-finetuned ImageNet network `<rcnnpath>/data/caffe_nets/ilsvrc_2012_train_iter_310k` to `<deeppyramidpath>/data/caffe_nets/ilsvrc_2012_train_iter_310k` (or just create a symlink).
 
 ### Usage
 
@@ -42,8 +42,8 @@ This code was used in our [tech report](http://arxiv.org/pdf/1409.5403v2.pdf) ab
 
 ### Uses
 
-DeepPyramid can be used for implementing DPMs on deep convolutional network features, rather than HOG features.
+DeepPyramid can be used for implementing DPMs on deep convolutional network features, rather than HOG features. It can also be used whenever you need a dense multiscale pyramid of image features.
 
 ### Caveats
 
-The implementation is designed to be simple and as a result is rather inefficient. There are a variety of ways to speed it up, and they will be done in the feature. For now, it takes about 0.5 to 0.6 seconds to compute a feature pyramid on an NVIDIA Titan GPU.
+The implementation is designed to be simple and as a result is very inefficient. There are a variety of ways to speed it up, and they will be done in the feature. For now, it takes about 0.5 to 0.6 seconds to compute a feature pyramid on an NVIDIA Titan GPU, which is acceptable.
