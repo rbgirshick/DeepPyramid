@@ -20,7 +20,7 @@ ip.addParamValue('net_file', ...
 
 % network prototxt file
 ip.addParamValue('def_file', ...
-    './model-defs/rcnn_batch_7_output_max5_plane2k.prototxt', ...
+    './model-defs/pyramid_cnn_output_conv5_scales_7_plane_1713.prototxt', ...
     @isstr);
 
 % Set use_gpu to false to use the CPU
@@ -37,19 +37,13 @@ opts = ip.Results;
 cnn.binary_file = opts.net_file;
 cnn.definition_file = opts.def_file;
 cnn.init_key = -1;
-
-% load the ilsvrc image mean
-data_mean_file = 'ilsvrc_2012_mean.mat';
-assert(exist(data_mean_file, 'file') ~= 0);
-% input size business isn't likley necessary, but we're doing it
-% to be consistent with previous experiments
-ld = load(data_mean_file);
-mu = ld.image_mean; clear ld;
-input_size = 227;
-off = floor((size(mu,1) - input_size)/2)+1;
-mu = mu(off:off+input_size-1, off:off+input_size-1, :);
-mu = sum(sum(mu, 1), 2) / size(mu, 1) / size(mu, 2);
-cnn.mu = mu;
+cnn.mu = get_channelwise_mean;
+cnn.pyra.dimx = 1713;
+cnn.pyra.dimy = 1713;
+cnn.pyra.stride = 16;
+cnn.pyra.num_levels = 7;
+cnn.pyra.num_channels = 256;
+cnn.pyra.scale_factor = sqrt(2);
 
 if opts.use_caffe
   cnn.init_key = ...
@@ -61,3 +55,19 @@ if opts.use_caffe
     caffe('set_mode_cpu');
   end
 end
+
+
+% ------------------------------------------------------------------------
+function mu = get_channelwise_mean()
+% ------------------------------------------------------------------------
+% load the ilsvrc image mean
+data_mean_file = 'ilsvrc_2012_mean.mat';
+assert(exist(data_mean_file, 'file') ~= 0);
+% input size business isn't likley necessary, but we're doing it
+% to be consistent with previous experiments
+ld = load(data_mean_file);
+mu = ld.image_mean; clear ld;
+input_size = 227;
+off = floor((size(mu,1) - input_size)/2)+1;
+mu = mu(off:off+input_size-1, off:off+input_size-1, :);
+mu = sum(sum(mu, 1), 2) / size(mu, 1) / size(mu, 2);

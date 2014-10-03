@@ -1,25 +1,31 @@
-function pyra = demo_deep_pyramid()
+function pyra = demo_deep_pyramid(im)
 
 if exist('caffe') ~= 3
   error('You must add matcaffe to your path.');
 end
 
 if ~exist('data/caffe_nets/ilsvrc_2012_train_iter_310k')
-  error('You need the CNN model in %s.', ...
-      'data/caffe_nets/ilsvrc_2012_train_iter_310k');
+  error(['You need the CNN model in %s. ' ...
+         'You can get this model by following ' ...
+         'the R-CNN installation instructions.'], ...
+        'data/caffe_nets/ilsvrc_2012_train_iter_310k');
 end
 
-% real use settings (compute features using the GPU)
-%USE_GPU = true;
-%USE_CACHE = false;
-%USE_CAFFE = true;
+if 1
+  % real use settings (compute features using the GPU)
+  USE_GPU = true;
+  USE_CACHE = false;
+  USE_CAFFE = true;
+else
+  % fast demo settings
+  USE_GPU = false;
+  USE_CACHE = true;
+  USE_CAFFE = false;
+end
 
-% fast demo settings
-USE_GPU = false;
-USE_CACHE = true;
-USE_CAFFE = false;
-
-im = imread('000084.jpg');
+if ~exist('im', 'var') || isempty(im)
+  im = imread('000084.jpg');
+end
 bbox = [263 145 381 225];
 
 cnn = init_cnn_model('use_gpu', USE_GPU, 'use_caffe', USE_CAFFE);
@@ -35,17 +41,25 @@ padx = 0;
 pady = 0;
 
 th = tic;
-pyra = deep_pyramid(im, cnn, padx, pady, cache_opts);
+pyra = deep_pyramid(im, cnn, cache_opts);
 fprintf('deep_pyramid took %.3fs\n', toc(th));
 
-fprintf('Press any key to loop through feature channels.\n');
+pyra = deep_pyramid_add_padding(pyra, padx, pady);
+
+fprintf(['Press almost any key (with fig focused) to loop through ' ...
+         'feature channels (or esc to exit).\n']);
 for channel = 1:256
   vis_pyramid(im, pyra, bbox, channel);
-  pause;
+  [~, ~, key_code] = ginput(1);
+  if key_code == 27
+    break;
+  end
 end
 
 
+% ------------------------------------------------------------------------
 function vis_pyramid(im, pyra, bbox, channel)
+% ------------------------------------------------------------------------
 
 pyra_boxes = im_to_pyra_coords(pyra, bbox);
 
@@ -73,7 +87,7 @@ for level = 1:pyra.num_levels
   imagesc(pyra.feat{level}(:,:,channel), [0 max_val]);
   axis image;
   rectangle('Position', bbox_to_xywh(pyra_boxes{level}), 'EdgeColor', 'r');
-  title(sprintf('level %d', level));
+  title(sprintf('level %d; scale = %.2fx', level, pyra.scales(level)));
 
   % project pyramid box back to image and display as red
   im_bbox = pyra_to_im_coords(pyra, [pyra_boxes{level} level]);
