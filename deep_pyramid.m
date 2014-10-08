@@ -1,12 +1,8 @@
-function [pyra, im_pyra] = deep_pyramid(im, cnn_model, cache_opts)
-% pyra = deep_pyramid(im, cnn_model, cache_opts)
+function [pyra, im_pyra] = deep_pyramid(im, cnn_model)
+% [pyra, im_pyra] = deep_pyramid(im, cnn_model, cache_opts)
 %
 % im: a color image
 % cnn_model: a handle to the model loaded into caffe
-% cache_opts [optional]
-%   .cache_dir: directory where cache is
-%   .image_id: file name (without extension) inside cache directory
-%   .debug [optional]: print info about cache hit/miss
 
 % AUTORIGHTS
 % ---------------------------------------------------------
@@ -17,28 +13,6 @@ function [pyra, im_pyra] = deep_pyramid(im, cnn_model, cache_opts)
 % LICENSE. Please retain this notice and LICENSE if you use
 % this file (or any portion of it) in your project.
 % ---------------------------------------------------------
-
-% Load from cache if cache_opts is specified
-if exist('cache_opts', 'var') && ~isempty(cache_opts)
-  cache_dir = cache_opts.cache_dir;
-  image_id = cache_opts.image_id;
-  debug = isfield(cache_opts, 'debug') & cache_opts.debug;
-
-  cache_file = fullfile(cache_dir, [image_id '.mat']);
-  if exist(cache_file, 'file')
-    if debug
-      warning('Loaded cache file %s.', cache_file);
-    end
-    ld = load(cache_file);
-    pyra = ld.pyra;
-    assert(pyra.padx == 0);
-    assert(pyra.pady == 0);
-    assert(ndims(pyra.feat) == 4);
-    return;
-  elseif debug
-    warning('Cache file %s not found.', cache_file);
-  end
-end
 
 [pyra, im_pyra] = feat_pyramid(im, cnn_model);
 
