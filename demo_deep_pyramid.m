@@ -43,18 +43,19 @@ bbox = [263 145 381 225];
 cnn = init_cnn_model('use_gpu', USE_GPU, 'use_caffe', USE_CAFFE);
 
 if USE_CACHE
-  cache_opts.cache_dir = '.';
-  cache_opts.image_id = 'cached_pyra';
+  cache_opts.cache_file = './cached_pyra.mat';
   cache_opts.debug = true;
+  cache_opts.write_on_miss = true;
+  th = tic;
+  pyra = deep_pyramid_cache_wrapper(im, cnn, cache_opts);
+  fprintf('deep_pyramid_cache_wrapper took %.3fs\n', toc(th));
 else
-  cache_opts = [];
+  th = tic;
+  pyra = deep_pyramid(im, cnn);
+  fprintf('deep_pyramid took %.3fs\n', toc(th));
 end
 padx = 0;
 pady = 0;
-
-th = tic;
-pyra = deep_pyramid(im, cnn, cache_opts);
-fprintf('deep_pyramid took %.3fs\n', toc(th));
 
 pyra = deep_pyramid_add_padding(pyra, padx, pady);
 
