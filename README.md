@@ -46,4 +46,4 @@ DeepPyramid can be used for implementing DPMs on deep convolutional network feat
 
 ### Caveats
 
-The implementation is designed to be simple and as a result is very inefficient. There are a variety of ways to speed it up, and they will be done in the feature. For now, it takes about 0.5 to 0.6 seconds to compute a feature pyramid on an NVIDIA Titan GPU, which is acceptable.
+The implementation is designed to be simple and as a result is very inefficient. There are a variety of ways to speed it up, and they will be done in the future. For now, it takes about 0.5 to 0.6 seconds to compute a feature pyramid on an NVIDIA Titan GPU, which is acceptable.
