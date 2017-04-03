@@ -31,7 +31,7 @@ This code was used in our [tech report](http://arxiv.org/pdf/1409.5403v2.pdf) ab
   0. DeepPyramid has been tested with master and dev at the time of this writing
 0. **Get DeepPyramid**
   0. `git clone https://github.com/rbgirshick/DeepPyramid.git`
-  0. If you haven't installed R-CNN, you'll need to download its [models](http://www.cs.berkeley.edu/~rbg/r-cnn-release1-data.tgz)
+  0. If you haven't installed R-CNN, you'll need to download its [models](https://dl.dropboxusercontent.com/s/og7ghmiken2olzh/r-cnn-release1-data.tgz?dl=0)
   1. Copy R-CNN's non-finetuned ImageNet network `<rcnnpath>/data/caffe_nets/ilsvrc_2012_train_iter_310k` to `<deeppyramidpath>/data/caffe_nets/ilsvrc_2012_train_iter_310k` (or just create a symlink).
 
 ### Usage
